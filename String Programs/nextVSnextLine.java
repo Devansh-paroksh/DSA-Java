@@ -12,5 +12,24 @@ class nextVSnextLine
         System.out.println("Enter the string to test nextLine method");
         String s2 = sc.nextLine();
         System.out.println("String entered via nextLine is "+s2);
+
+        //Abnormal condition
+
+        // System.out.println("Enter the number");
+        // int n = sc.nextInt();
+        // System.out.println("Entered via nextInt is "+n);
+        // System.out.println("Enter the string to test nextLine method");
+        // String s2 = sc.nextLine();
+        // System.out.println("String entered via nextLine is "+s2);
+
+        //Fix of abnormal condition 
+
+        // System.out.println("Enter the number");
+        // int n = sc.nextInt();
+        // System.out.println("Entered via nextInt is "+n);
+        // sc.nextLine();
+        // System.out.println("Enter the string to test nextLine method");
+        // String s2 = sc.nextLine();
+        // System.out.println("String entered via nextLine is "+s2);
     }
 }
