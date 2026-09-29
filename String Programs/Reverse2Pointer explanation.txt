@@ -1,0 +1,61 @@
+reversing a string using the 2-pointer method like two people standing at the two ends of a row and swapping places.
+
+Suppose:
+
+String = "HELLO"
+
+Index:   0   1   2   3   4
+         H   E   L   L   O
+         ↑               ↑
+       left             right
+1. Put two pointers
+left starts at the first character
+right starts at the last character
+left = 0
+right = 4
+2. Swap the two characters
+
+Swap H and O:
+
+O E L L H
+↑       ↑
+L       R
+
+Then move both pointers toward the center:
+
+left++   → 1
+right--  → 3
+3. Swap again
+
+Now:
+
+O E L L H
+  ↑   ↑
+  L   R
+
+Swap E and L:
+
+O L L E H
+
+Move pointers:
+
+left = 2
+right = 2
+
+Now both pointers have met, so we stop.
+
+Final:
+
+"OLLEH"
+Why do we need only 2 pointers?
+
+Because every swap puts two characters in their final positions.
+
+For "HELLO":
+
+H ↔ O    → O E L L H
+E ↔ L    → O L L E H
+
+The middle L doesn't need to move.
+
+So instead of creating another string and copying characters, we work from both ends toward the middle.
