@@ -1,0 +1,622 @@
+next vs nextLine
+
+
+
+Question: explain it to me : 
+my code :
+import java**.**util**.**Scanner;
+
+**class** nextVSnextLine
+
+{
+
+    **public** **static** **void** main(String[] args) 
+
+    {
+
+        Scanner sc=new Scanner(System.in);
+
+
+
+        System.out.println("Enter the string to test nextLine method");
+
+        String s2 = sc.nextLine();
+
+        System.out.println("String entered via nextLine is "+s2);
+
+        System.out.println("Enter the string to test next method");
+
+        String s1 = sc.next();
+
+        System.out.println("String entered via nextLine is "+s1);
+
+    }
+
+}
+
+output: PS D:\DSA Projects\DSA-Java\String Programs> java nextVSnextLine       &#x20;
+Enter the string to test next method
+My name is Devansh
+String entered via nextLine is My
+Enter the string to test nextLine method
+String entered via nextLine is  name is Devansh
+PS D:\DSA Projects\DSA-Java\String Programs> javac .\nextVSnextLine.java
+PS D:\DSA Projects\DSA-Java\String Programs> java nextVSnextLine       &#x20;
+Enter the string to test nextLine method
+My name is Devansh
+String entered via nextLine is My name is Devansh
+Enter the string to test next method
+My name is Devansh
+String entered via nextLine is My
+PS D:\DSA Projects\DSA-Java\String Programs> 
+
+
+
+but if my code is : import java**.**util**.**Scanner;
+
+**class** nextVSnextLine
+
+{
+
+    **public** **static** **void** main(String[] args) 
+
+    {
+
+        Scanner sc=new Scanner(System.in);
+
+        System.out.println("Enter the string to test next method");
+
+        String s1 = sc.next();
+
+        System.out.println("String entered via nextLine is "+s1);
+
+        System.out.println("Enter the string to test nextLine method");
+
+        String s2 = sc.nextLine();
+
+        System.out.println("String entered via nextLine is "+s2);
+
+    }
+
+}
+
+output is : PS D:\DSA Projects\DSA-Java\String Programs> javac .\nextVSnextLine.java
+PS D:\DSA Projects\DSA-Java\String Programs> java nextVSnextLine       &#x20;
+Enter the string to test next method
+My name is Devansh
+String entered via nextLine is My
+Enter the string to test nextLine method
+String entered via nextLine is  name is Devansh
+PS D:\DSA Projects\DSA-Java\String Programs>&#x20;
+
+
+
+
+-------------------------------------
+
+Solution: 
+
+
+First understand what Scanner is actually reading
+
+When you type:
+
+My name is Devansh
+
+and press Enter, Scanner effectively sees:
+
+My name is Devansh\n
+
+Think of it as:
+
+My | name | is | Devansh | \n
+
+\n is the Enter/newline character.
+
+The important question is:
+
+Who consumes the spaces and who consumes the newline?
+
+That's where next() and nextLine() differ.
+
+2. next() — reads ONE token
+
+Suppose you enter:
+
+My name is Devansh
+
+When you do:
+
+String s1 = sc.next();
+
+next() reads only the next token.
+
+So:
+
+My name is Devansh
+^^
+
+It takes:
+
+"My"
+
+and stops at the space.
+
+So:
+
+s1 = "My";
+
+The Scanner's position is now roughly:
+
+My | name | is | Devansh | \n
+     ↑
+   Scanner
+
+It has not consumed the rest of the line.
+
+3. nextLine() — reads the rest of the current line
+
+Now if you immediately do:
+
+String s2 = sc.nextLine();
+
+Scanner starts from where next() stopped:
+
+My | name | is | Devansh | \n
+     ↑
+
+nextLine() says:
+
+"Give me everything from my current position until I reach \n."
+
+Therefore it gets:
+
+" name is Devansh"
+
+Notice the leading space.
+
+So:
+
+s2 = " name is Devansh";
+
+That's why your output is:
+
+String entered via nextLine is  name is Devansh
+4. Your second program step-by-step
+
+Your code is:
+
+System.out.println("Enter the string to test next method");
+
+String s1 = sc.next();
+
+System.out.println("String entered via nextLine is " + s1);
+
+System.out.println("Enter the string to test nextLine method");
+
+String s2 = sc.nextLine();
+
+System.out.println("String entered via nextLine is " + s2);
+
+You enter:
+
+My name is Devansh
+Step 1
+sc.next();
+
+Input:
+
+My name is Devansh\n
+
+next() takes:
+
+My
+
+Scanner is left at:
+
+My name is Devansh\n
+   ↑
+
+Conceptually:
+
+[My] [name] [is] [Devansh] [\n]
+      ↑
+Step 2
+
+Then:
+
+sc.nextLine();
+
+It reads:
+
+ name is Devansh
+
+until \n.
+
+Therefore:
+
+s1 = "My"
+s2 = " name is Devansh"
+
+Output:
+
+String entered via nextLine is My
+String entered via nextLine is  name is Devansh
+5. Now let's understand your FIRST experiment
+
+You initially had:
+
+String s2 = sc.nextLine();
+
+...
+
+String s1 = sc.next();
+
+You entered:
+
+My name is Devansh
+
+First:
+
+sc.nextLine();
+
+nextLine() reads the entire line:
+
+My name is Devansh
+
+So:
+
+s2 = "My name is Devansh";
+
+And importantly, it also consumes the newline:
+
+My name is Devansh\n
+                    ↑
+                    consumed
+
+Now Scanner is ready for a completely new line.
+
+You then enter:
+
+My name is Devansh
+
+and:
+
+sc.next();
+
+takes only:
+
+My
+
+So:
+
+s1 = "My";
+
+That's why your second run produced:
+
+String entered via nextLine is My name is Devansh
+...
+String entered via nextLine is My
+6. The most important difference
+
+Think of input as a line:
+
+My name is Devansh\n
+next()
+
+Takes one word/token:
+
+My
+^^
+
+Leaves:
+
+ name is Devansh\n
+nextLine()
+
+Takes everything until Enter:
+
+My name is Devansh
+^^^^^^^^^^^^^^^^^^^
+
+and consumes the \n too.
+
+7. Visualize the Scanner cursor
+
+This is probably the easiest way to remember it.
+
+Input:
+
+My name is Devansh\n
+Initially
+↓
+My name is Devansh\n
+After next()
+My
+  ↓
+ name is Devansh\n
+
+It consumed only My.
+
+After nextLine()
+My name is Devansh
+                   ↓
+                   \n
+
+It consumed everything remaining on that line.
+
+8. Why does the infamous nextInt() → nextLine() problem happen?
+
+It's the same concept.
+
+For example:
+
+System.out.println("Enter age:");
+int age = sc.nextInt();
+
+System.out.println("Enter name:");
+String name = sc.nextLine();
+
+User enters:
+
+23\n
+
+nextInt() takes:
+
+23
+^^
+
+but leaves:
+
+\n
+↑
+
+Then nextLine() sees:
+
+\n
+
+and says:
+
+"The current line has ended. I'll return the remaining text."
+
+The remaining text is nothing.
+
+Therefore:
+
+name = "";
+
+This is the same reason.
+
+9. How to fix it
+
+If you use:
+
+nextInt()
+nextLine()
+
+you normally do:
+
+int age = sc.nextInt();
+sc.nextLine(); // consume leftover Enter
+
+String name = sc.nextLine();
+
+Example:
+
+System.out.println("Enter age:");
+int age = sc.nextInt();
+
+sc.nextLine(); // consume \n
+
+System.out.println("Enter name:");
+String name = sc.nextLine();
+10. next() vs nextLine() — technically
+Method	Reads	Stops at	Consumes newline?
+next()	One token	Whitespace	No
+nextLine()	Remaining/current line	\n	Yes
+Example input
+My name is Devansh
+sc.next()
+
+returns:
+
+"My"
+
+while:
+
+sc.nextLine()
+
+returns:
+
+"My name is Devansh"
+
+if called at the beginning of the line.
+
+🧠 The one rule you should remember
+
+next() thinks in TOKENS. nextLine() thinks in LINES.
+
+Input:
+My name is Devansh\n
+
+next()
+ ↓
+"My"
+
+nextLine()
+ ↓
+"My name is Devansh"
+
+And if you do:
+
+next()
+nextLine()
+
+then:
+
+next()     → "My"
+nextLine() → " name is Devansh"
+
+because next() leaves the Scanner in the middle of the line, while nextLine() continues from there.
+
+Summary
+next()
+  ↓
+reads ONE TOKEN
+  ↓
+does NOT consume the rest of the line
+
+nextLine()
+  ↓
+reads EVERYTHING remaining on the current line
+  ↓
+consumes the newline
+
+That's the entire reason behind the output you're getting.
+
+
+-------------------------------
+Question: maine bola pehle next() se input le liya ab agli line me out put diya
+ab agli line me nextLine likha hai to scanner ko fresh input ki tarah isey treat karna chahiye na
+
+Haan, ab tumhara actual question clear hai 😄 — tum Scanner ke behavior nahi, program ki lines ke behavior ki baat kar rahe ho.
+
+Tum keh rahe ho:
+
+String s1 = sc.next();
+
+System.out.println(...);
+
+String s2 = sc.nextLine();
+
+Tumhari expectation:
+
+Line 1: next()      → user se input lo → "My"
+Line 2: println     → output
+Line 3: nextLine()  → ab NEW/FRESH input lo
+                       ↓
+                    user dobara type kare
+
+Lekin Java mein program ki next line par nextLine() likhne se input automatically "new input session" nahi ban jaata.
+
+Why?
+
+Because next() ne jo input liya tha, us input ki poori line abhi bhi Scanner ke andar pending hai.
+
+Tumne diya:
+
+My name is Devansh[Enter]
+
+next() ne sirf:
+
+My
+
+liya.
+
+But input actually tha:
+
+My name is Devansh\n
+^^
+
+After next():
+
+My name is Devansh\n
+   ↑
+   Scanner is here
+
+Ab tumhari Java code ki next line:
+
+System.out.println(...);
+
+input stream ko reset nahi karti.
+
+Phir:
+
+String s2 = sc.nextLine();
+
+Scanner ke liye iska matlab hai:
+
+"Meri current position se current line ke end tak read karo."
+
+Current position yahan hai:
+
+My name is Devansh\n
+   ↑
+
+Therefore:
+
+" name is Devansh"
+
+milta hai.
+
+🔥 Tumhare question ka exact answer
+
+Tum keh rahe ho:
+
+"Lekin nextLine() code ki agli line mein hai, toh fresh input kyun nahi?"
+
+Because Java source-code ki line aur input ki line completely independent cheezein hain.
+
+Ye do alag worlds hain:
+
+JAVA PROGRAM                  USER INPUT
+
+next()        ─────────────→  My name is Devansh
+println()                     ↑
+                              same input line
+
+nextLine()    ─────────────→  ↑
+                              Scanner abhi bhi
+                              isi input line par hai
+
+Java mein:
+
+next();
+println();
+nextLine();
+
+likhne ka matlab 3 input lines nahi hai.
+
+Input ka boundary Enter (\n) decide karta hai, Java code ki lines nahi.
+
+Agar tum genuinely chahte ho:
+next() → first input
+nextLine() → fresh second input
+
+toh pehle current line ka leftover consume karna padega:
+
+String s1 = sc.next();
+
+System.out.println("String entered: " + s1);
+
+sc.nextLine(); // consume remaining part of current input line
+
+String s2 = sc.nextLine(); // NOW waits for fresh line
+
+System.out.println("String entered: " + s2);
+
+Ab:
+
+Input 1:
+My name is Devansh
+        ↓
+next() → My
+
+nextLine() [first one]
+        ↓
+consumes " name is Devansh\n"
+
+nextLine() [second one]
+        ↓
+WAIT
+        ↓
+User enters:
+I am learning Java
+
+So output:
+
+My
+I am learning Java
+One-line takeaway
+
+next() ke baad nextLine() ko fresh input banana hai, toh pehle leftover current line consume karo. Java ki next source-code line automatically input ki next line nahi hoti.

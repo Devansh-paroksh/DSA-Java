@@ -1,0 +1,447 @@
+String methods
+
+Absolutely. For your Java notes, I’d document them in a **quick-reference format**: **What it does → syntax → code → output → important point**.
+
+# Java String Methods — Quick Notes
+
+### A. `isEmpty()` vs `isBlank()`
+
+#### 1. `isEmpty()`
+
+Checks whether the String has **0 characters**.
+
+```java
+String str = "";
+
+System.out.println(str.isEmpty());
+```
+
+**Output:**
+
+```text
+true
+```
+
+⚠️ `" "` is **not empty** because it contains a space.
+
+```java
+String str = " ";
+
+System.out.println(str.isEmpty());  // false
+```
+
+#### 2. `isBlank()`
+
+Checks whether the String is **empty or contains only whitespace**.
+
+```java
+String str = "   ";
+
+System.out.println(str.isBlank());
+```
+
+**Output:**
+
+```text
+true
+```
+
+### Difference
+
+| String   | `isEmpty()` | `isBlank()` |
+| -------- | ----------: | ----------: |
+| `""`     |      `true` |      `true` |
+| `" "`    |     `false` |      `true` |
+| `"  "`   |     `false` |      `true` |
+| `"Java"` |     `false` |     `false` |
+
+> `isBlank()` was introduced in **Java 11**.
+
+---
+
+# B. `contains()`
+
+Checks whether a String contains a particular **sequence of characters**.
+
+### Syntax
+
+```java
+string.contains("sequence");
+```
+
+### Example
+
+```java
+String str = "I am learning Java";
+
+System.out.println(str.contains("Java"));
+System.out.println(str.contains("Python"));
+```
+
+**Output:**
+
+```text
+true
+false
+```
+
+### Important
+
+`contains()` returns a **boolean**.
+
+```java
+boolean result = str.contains("Java");
+```
+
+It is **case-sensitive**:
+
+```java
+"Java".contains("java"); // false
+```
+
+---
+
+# C. `substring()`
+
+Used to extract a **part of a String**.
+
+There are two commonly used versions.
+
+### 1. `substring(beginIndex)`
+
+Starts from the given index and continues to the end.
+
+```java
+String str = "Hello Java";
+
+String result = str.substring(6);
+
+System.out.println(result);
+```
+
+**Output:**
+
+```text
+Java
+```
+
+Index:
+
+```text
+H e l l o   J a v a
+0 1 2 3 4 5 6 7 8 9
+```
+
+---
+
+### 2. `substring(beginIndex, endIndex)`
+
+Extracts characters from `beginIndex` **up to but NOT including** `endIndex`.
+
+```java
+String str = "Hello Java";
+
+String result = str.substring(0, 5);
+
+System.out.println(result);
+```
+
+**Output:**
+
+```text
+Hello
+```
+
+### Important Rule
+
+```text
+beginIndex → included
+endIndex   → excluded
+```
+
+So:
+
+```java
+str.substring(0, 5);
+```
+
+means:
+
+```text
+0 1 2 3 4
+↑         ↑
+included  excluded
+```
+
+Returns a **String**.
+
+---
+
+# D. `valueOf()`
+
+`String.valueOf()` converts a value of another data type into a **String**.
+
+### Example
+
+```java
+int num = 100;
+
+String str = String.valueOf(num);
+
+System.out.println(str);
+```
+
+**Output:**
+
+```text
+100
+```
+
+You can convert different types:
+
+```java
+String a = String.valueOf(100);       // int
+String b = String.valueOf(10.5);      // double
+String c = String.valueOf(true);      // boolean
+String d = String.valueOf('A');       // char
+```
+
+### Why is it useful?
+
+Suppose you have:
+
+```java
+int age = 23;
+```
+
+and want to concatenate/work with it as a String:
+
+```java
+String result = String.valueOf(age);
+
+System.out.println(result);
+```
+
+**Important:** `valueOf()` is a **static method of the `String` class**.
+
+---
+
+# E. `toCharArray()`
+
+Converts a String into a **character array (`char[]`)**.
+
+### Syntax
+
+```java
+string.toCharArray();
+```
+
+### Example
+
+```java
+String str = "Java";
+
+char[] arr = str.toCharArray();
+
+System.out.println(arr[0]);
+System.out.println(arr[1]);
+```
+
+**Output:**
+
+```text
+J
+a
+```
+
+The array is:
+
+```text
+['J', 'a', 'v', 'a']
+```
+
+You can also loop through it:
+
+```java
+String str = "Java";
+
+char[] arr = str.toCharArray();
+
+for (char ch : arr) {
+    System.out.println(ch);
+}
+```
+
+**Output:**
+
+```text
+J
+a
+v
+a
+```
+
+### Remember
+
+```text
+String → toCharArray() → char[]
+```
+
+---
+
+# F. `split()`
+
+Splits a String into multiple parts based on a **delimiter/regular expression**.
+
+It returns a **String array (`String[]`)**.
+
+### Example
+
+```java
+String str = "Java,Python,SQL";
+
+String[] arr = str.split(",");
+
+for (String s : arr) {
+    System.out.println(s);
+}
+```
+
+**Output:**
+
+```text
+Java
+Python
+SQL
+```
+
+The result is:
+
+```text
+["Java", "Python", "SQL"]
+```
+
+### Another example
+
+```java
+String str = "Java Python SQL";
+
+String[] arr = str.split(" ");
+
+for (String s : arr) {
+    System.out.println(s);
+}
+```
+
+**Output:**
+
+```text
+Java
+Python
+SQL
+```
+
+### Remember
+
+```text
+String → split() → String[]
+```
+
+⚠️ `split()` uses **regex**, so characters such as `.`, `|`, `+`, `*` may need escaping.
+
+---
+
+# G. `replace()`
+
+Replaces characters or character sequences in a String and returns a **new String**.
+
+### 1. Replace a character
+
+```java
+String str = "Java";
+
+String result = str.replace('a', 'o');
+
+System.out.println(result);
+```
+
+**Output:**
+
+```text
+Jovo
+```
+
+### 2. Replace a String
+
+```java
+String str = "I love Java";
+
+String result = str.replace("Java", "Python");
+
+System.out.println(result);
+```
+
+**Output:**
+
+```text
+I love Python
+```
+
+### Important
+
+Strings are immutable, so the original String doesn't change.
+
+```java
+String str = "Java";
+
+str.replace("Java", "Python");
+
+System.out.println(str);
+```
+
+**Output:**
+
+```text
+Java
+```
+
+You need to store the returned String:
+
+```java
+str = str.replace("Java", "Python");
+```
+
+### Remember
+
+```text
+replace() → returns a new String
+```
+
+---
+
+# 🧠 One-Page Revision Table
+
+| Method          | Purpose                       | Returns    |
+| --------------- | ----------------------------- | ---------- |
+| `isEmpty()`     | Checks length = 0             | `boolean`  |
+| `isBlank()`     | Checks empty/whitespace       | `boolean`  |
+| `contains()`    | Checks if sequence exists     | `boolean`  |
+| `substring()`   | Extracts part of String       | `String`   |
+| `valueOf()`     | Converts value to String      | `String`   |
+| `toCharArray()` | Converts String to characters | `char[]`   |
+| `split()`       | Splits String                 | `String[]` |
+| `replace()`     | Replaces characters/text      | `String`   |
+
+### Easy memory trick
+
+```text
+isEmpty / isBlank / contains → boolean
+
+substring / valueOf / replace → String
+
+toCharArray → char[]
+
+split → String[]
+```
+
+**One important correction to your note:** `split()` doesn't simply "return string"; it returns a **`String[]` (array of Strings)**, while `toCharArray()` returns **`char[]`**.
