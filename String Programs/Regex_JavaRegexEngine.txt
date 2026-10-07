@@ -1,0 +1,676 @@
+Regex sounds complicated at first, but the core idea is actually simple.
+Regex = Regular Expression
+Think of Regex as a language for describing patterns in text.
+Instead of telling the computer:
+"Find exactly this word."
+
+you can tell it:
+"Find text that follows this pattern."
+
+1. ELI10: Regex is like a search pattern
+Suppose you have this text:
+My phone number is 9876543210
+
+If you want to find the phone number, you could search for:
+9876543210
+
+But that only finds that exact number.
+What if the number changes?
+9876543210
+8765432109
+9123456780
+
+You can describe the pattern instead:
+"Find 10 consecutive digits."
+
+Regex gives you a way to write that pattern:
+[0-9]{10}
+
+So:
+[0-9]{10}
+
+means:
+[0-9] → any digit from 0 to 9
+{10}  → exactly 10 times
+
+Therefore:
+9876543210  ✅
+8765432109  ✅
+12345       ❌
+
+That's Regex.
+2. So Regex is NOT a programming language
+This distinction is important.
+Regex is a pattern-matching language.
+For example:
+[0-9]{10}
+
+is not Java code.
+It's a pattern that Java's Regex engine can understand.
+Java can then use that pattern to search, validate, split, replace, etc.
+3. Why does Java use Regex?
+Regex is useful whenever we work with text patterns.
+For example:
+Find digits
+[0-9]
+
+Find lowercase letters
+[a-z]
+
+Find uppercase letters
+[A-Z]
+
+Find a 10-digit number
+[0-9]{10}
+
+Find a word starting with J
+J[a-zA-Z]*
+
+4. Regex has its own symbols
+This is where your previous split() question connects.
+Regex gives special meanings to certain characters.
+For example:
+.
+.
+
+means:
+Any single character
+
+So:
+J.va
+
+can match:
+Java
+Jova
+J1va
+J@va
+
+because . means "any one character".
+*
+*
+
+means:
+Previous thing can occur zero or more times
+
+For example:
+a*
+
+can match:
+""
+"a"
+"aa"
+"aaa"
+"aaaa"
+
++
++
+
+means:
+Previous thing occurs one or more times
+
+a+
+
+matches:
+"a"
+"aa"
+"aaa"
+
+but not:
+""
+
+|
+Means OR.
+Java|Python
+
+means:
+Match either Java OR Python.
+
+5. Now connect this to split()
+This is exactly why I told you:
+split()
+
+uses Regex.
+Suppose:
+String str = "Java-Python-SQL";
+
+You write:
+str.split("-");
+
+Here - is being used as the Regex pattern.
+Meaning:
+Split wherever - occurs.
+
+Result:
+Java
+Python
+SQL
+
+But look at .
+String str = "Java.Python.SQL";
+
+You might think:
+str.split(".");
+
+means:
+Split at ., right?
+
+No.
+Because Regex says:
+. = any character
+
+So Java doesn't interpret . as an ordinary dot.
+That's why we write:
+str.split("\\.");
+
+The Regex that ultimately reaches the Regex engine is:
+\.
+
+which means:
+Treat . as a literal dot.
+
+6. Where does Regex actually exist in Java?
+Java has a dedicated Regex API:
+java.util.regex
+
+The two major classes are:
+Pattern
+Matcher
+
+For example:
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+String text = "My number is 9876543210";
+
+Pattern pattern = Pattern.compile("[0-9]{10}");
+
+Matcher matcher = pattern.matcher(text);
+
+if (matcher.find()) {
+    System.out.println("10 digit number found");
+}
+
+Output:
+10 digit number found
+
+Here:
+[0-9]{10}
+
+is the Regex pattern.
+And:
+Pattern
+
+creates a compiled representation of that pattern.
+Matcher then searches the actual text.
+7. Think of it like this
+Imagine you have 1000 pages of text.
+You tell a person:
+"Find me every 10-digit number."
+
+They would manually scan the pages.
+Regex allows you to give the computer a search rule:
+[0-9]{10}
+
+Then the computer searches according to that rule.
+So:
+Regex
+  ↓
+Pattern/rule
+  ↓
+Text
+  ↓
+Find matching portions
+
+8. Regex is used for much more than searching
+Regex can be used for:
+Searching
+Find all email-like patterns
+
+Validation
+Is this a valid-looking phone number?
+
+Splitting
+"Java,Python,SQL".split(",")
+
+Replacing
+Replace every digit with *
+
+Extracting
+Extract all numbers from a sentence
+
+9. A real example
+Suppose:
+My email is devansh123@gmail.com
+
+You could create a pattern that describes an email structure.
+A simplified Regex might look like:
+[A-Za-z0-9]+@[A-Za-z0-9]+\.[A-Za-z]+
+
+Breaking it down:
+[A-Za-z0-9]+
+        ↓
+one or more letters/digits
+
+@
+        ↓
+literal @
+
+[A-Za-z0-9]+
+        ↓
+one or more letters/digits
+
+\.
+        ↓
+literal dot
+
+[A-Za-z]+
+        ↓
+one or more letters
+
+So it can recognize something like:
+devansh123@gmail.com
+
+10. The most important concept
+Don't think:
+Regex = complicated symbols.
+
+Think:
+Regex = a way to describe what text should look like.
+
+For example:
+[0-9]{10}
+
+is basically saying:
+"I want exactly 10 digits."
+
+And:
+[A-Z][a-z]+
+
+is basically saying:
+"I want one uppercase letter followed by one or more lowercase letters."
+
+For example:
+Java
+Python
+Hello
+
+🔥 And now your split() confusion makes sense
+When you write:
+str.split(".");
+
+Java doesn't think:
+". is a dot."
+
+It thinks:
+". is a Regex pattern."
+
+And Regex says:
+. = any character
+
+But when you write:
+str.split("\\.");
+
+Java passes:
+\.
+
+to Regex, and Regex says:
+"Ah, \. means a literal dot."
+
+That's the fundamental reason behind the escaping we discussed earlier.
+Final summary
+Regex
+  ↓
+Regular Expression
+  ↓
+A language used to describe patterns in text
+
+Examples:
+[0-9]       → one digit
+[0-9]{10}   → exactly 10 digits
+[a-z]       → lowercase letter
++           → one or more
+*           → zero or more
+|           → OR
+.           → any character
+\.          → literal dot
+
+Once you understand Regex, split(), replaceAll(), matches(), Pattern, and Matcher become much easier to understand.
+
+
+----------------------
+⚠️ split() uses **regex**, so characters such as ., |, +, * may need escaping.
+
+
+what does the above line mean -T
+Bilkul. Is line ko -T style mein samajhte hain: pehle simple analogy, phir actual Java behavior.
+
+1. ELI10 — split() ko ek cutting machine samjho
+Maan lo String hai:
+
+String str = "Java-Python-SQL";
+
+Aap bolte ho:
+
+str.split("-");
+
+Java - ko separator maan kar String ko cut kar dega:
+
+Java | Python | SQL
+Result:
+
+["Java", "Python", "SQL"]
+
+Yahan sab simple hai.
+
+2. Problem kahan aati hai?
+split() ka parameter normal text ki tarah treat nahi hota.
+
+Java split() ke andar Regular Expression (Regex) use hota hai.
+
+Matlab kuch characters ka Regex mein special meaning hota hai.
+
+For example:
+
+.   *   +   ?   |   ( )   [ ]   { }
+Ye characters Regex mein sirf "normal characters" nahi hain.
+
+3. Sabse important example: .
+Maan lo:
+
+String str = "Java.Python.SQL";
+
+Aap chahte ho ki . ke basis par split ho:
+
+Java
+Python
+SQL
+To naturally aap likhoge:
+
+String[] arr = str.split(".");
+
+Lekin problem ❌
+. Regex mein ek special character hai.
+
+Regex mein:
+
+. = any single character
+Yaani . ka matlab literally dot nahi, balki:
+
+"koi bhi ek character"
+
+Isliye:
+
+str.split(".");
+
+ka meaning Java ke liye essentially hai:
+
+"Jahan bhi koi character mile, wahan split karo."
+
+Jo aap nahi chahte.
+
+4. Escape karne ka meaning
+Agar humein Java ko kehna hai:
+
+"Mujhe Regex wala special . nahi chahiye. Mujhe actual dot . chahiye."
+
+To hum . ko escape karte hain.
+
+Regex mein escape karne ke liye:
+
+\.
+likhte hain.
+
+So:
+
+String str = "Java.Python.SQL";
+
+String[] arr = str.split("\\.");
+
+Output:
+
+Java
+Python
+SQL
+5. Lekin \\. kyun? \. kyun nahi?
+Yahan Java string aur Regex dono involved hain.
+
+Ye bahut important concept hai.
+
+Hum likhte hain:
+
+"\\."
+
+Isme Java pehle \\ ko process karta hai.
+
+Java level par:
+"\\."
+ ↓
+"\."
+Java actually Regex engine ko ye deta hai:
+
+\.
+Regex level par:
+\. 
+ka meaning hai:
+
+literal dot
+
+So complete flow:
+
+Java code
+"\\."
+   ↓
+Java String processing
+"\."
+   ↓
+Regex engine
+\. 
+   ↓
+Meaning
+literal .
+6. | ka example
+Suppose:
+
+String str = "Java|Python|SQL";
+
+Aap karna chahte ho:
+
+Java
+Python
+SQL
+Agar likha:
+
+String[] arr = str.split("|");
+
+Problem ❌
+
+Because Regex mein:
+
+|
+means OR.
+
+So literal | ke liye escape karna padega:
+
+String[] arr = str.split("\\|");
+
+Now:
+
+Java
+Python
+SQL
+7. + ka example
+Suppose:
+
+String str = "Java+Python+SQL";
+
++ Regex mein special meaning rakhta hai.
+
+So:
+
+str.split("+");
+
+❌ Incorrect.
+
+Use:
+
+str.split("\\+");
+
+8. * ka example
+Suppose:
+
+String str = "Java*Python*SQL";
+
+Use:
+
+String[] arr = str.split("\\*");
+
+9. Why are these called "special characters"?
+Because Regex language ne in characters ko instructions ke liye reserve kiya hua hai.
+
+For example:
+
+Character	Regex meaning
+.	Any character
+*	Zero or more occurrences
++	One or more occurrences
+?	Optional / zero or one
+`	`
+()	Grouping
+[]	Character set
+{}	Number of repetitions
+Isliye agar aapko inhe literally use karna hai, to escape karna padta hai.
+
+10. Normal character vs Regex special character
+Normal character
+String str = "Java-Python-SQL";
+
+String[] arr = str.split("-");
+
+- is not causing this particular Regex issue here, so this works.
+
+Special character
+String str = "Java.Python.SQL";
+
+String[] arr = str.split("\\.");
+
+Because . has special Regex meaning.
+
+11. Ek aur important point: split() ka argument Regex hai
+Ye line:
+
+str.split(",");
+
+dekhne mein lagti hai ki split() ko simply comma diya.
+
+Actually conceptually:
+
+String
+   ↓
+split(regex)
+   ↓
+Regex engine
+   ↓
+String[]
+Method declaration ko conceptually aise samajh sakte ho:
+
+public String[] split(String regex)
+
+Yaani parameter ka naam hi regex hai.
+
+Isliye:
+
+split(",")
+
+means:
+
+Regex , ko delimiter bana kar split karo.
+
+And:
+
+split("\\.")
+
+means:
+
+Regex \. ko delimiter bana kar split karo, jiska meaning literal . hai.
+
+12. Java + Regex = Double Escape
+Ye interview mein bahut useful concept hai.
+
+Agar Regex mein humein likhna hai:
+
+\.
+to Java String ke andar likhna padega:
+
+"\\."
+
+Because Java khud bhi \ ko escape character ke roop mein use karta hai.
+
+Two stages:
+Java source code
+"\\."
+   ↓
+Java creates String
+"\."
+   ↓
+Regex interprets it
+literal .
+Isi wajah se aapko aksar Regex ke saath double backslash \\ dikhai deta hai.
+
+13. Practical examples
+String s1 = "Java.Python.SQL";
+String[] a = s1.split("\\.");
+
+String s2 = "Java|Python|SQL";
+String[] b = s2.split("\\|");
+
+String s3 = "Java+Python+SQL";
+String[] c = s3.split("\\+");
+
+String s4 = "Java*Python*SQL";
+String[] d = s4.split("\\*");
+
+All of these split on the literal character.
+
+14. Very important distinction
+Don't memorize:
+
+"Every special character needs \\."
+
+Instead understand:
+
+If the delimiter has special meaning in Regex and I want its literal meaning, I need to escape it.
+
+For example:
+
+split(".")       // . means any character ❌
+split("\\.")     // . means literal dot ✅
+
+Similarly:
+
+split("|")       // | means OR ❌
+split("\\|")     // | means literal pipe ✅
+
+🧠 Final mental model
+Remember these 3 layers:
+
+Your Java code
+      ↓
+Java String escaping
+      ↓
+Regex interpretation
+      ↓
+Actual splitting
+So when you write:
+
+split("\\.")
+
+read it as:
+
+Java: \\ → give Regex one \
+
+Regex: \. → treat . literally
+
+split(): cut wherever literal . occurs.
+
+One-line interview answer
+String.split() accepts a regular expression as its argument. Therefore, characters that have special meanings in Regex, such as ., |, +, and *, must be escaped with \\ when we want to split using their literal character.
