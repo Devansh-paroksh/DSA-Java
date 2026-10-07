@@ -1,0 +1,400 @@
+PROBLEM AROSE WHEN I DID "git switch string", it renamed already available String branch on local to string so when i did "git push" it said no upstream branch set on remote as name was changed to string while on remote it is String
+
+Reason:  Windows handles text as case insensitive but git handles as case sensitive.
+
+------------------
+
+How to find exact root cause and solve such problem---->
+
+see on bottom left it says string but current branch is String
+Yes — I can see exactly what you're pointing at. The VS Code bottom-left status bar says:
+
+string*
+while your terminal says:
+
+git branch --show-current
+String
+and:
+
+git symbolic-ref --short HEAD
+String
+So which one is correct?
+The terminal/Git output is authoritative. You are currently on String. ✅
+
+VS Code is displaying the branch as string, which means we're dealing with a VS Code/Git case-display issue, not that Git has actually switched you to another branch.
+
+Also, the * in:
+
+string*
+means VS Code sees uncommitted changes in the working tree. That's consistent with your git status, which showed nextVSnextLine.java modified.
+
+Let's investigate properly now
+Don't rename or delete anything yet.
+
+Run these commands one at a time:
+
+1. Ask Git to list the exact local branch refs
+git for-each-ref --format="%(refname:short)" refs/heads/
+
+2. Check the exact branch Git has HEAD attached to
+You already did this, but let's keep it as our reference:
+
+git symbolic-ref --short HEAD
+
+3. Check Git's case-sensitivity setting
+git config --get core.ignorecase
+
+4. Check the branch through Git's revision system
+git rev-parse --abbrev-ref HEAD
+
+Paste the output of all four.
+
+Why I want these instead of immediately fixing VS Code
+We currently have this interesting situation:
+
+                 Git
+                 │
+                 ↓
+HEAD ─────────→ String
+                 │
+                 ↓
+          origin/String
+but VS Code displays:
+
+string*
+We need to determine whether:
+
+Git's actual branch ref is String and VS Code is simply displaying the old casing, or
+There are actually two case-conflicting refs (String and string) somewhere in the repository.
+The first is mostly a UI/cache issue.
+
+The second is something we should clean up carefully.
+
+And importantly
+Do not run:
+
+git branch -m String
+
+and don't delete string yet.
+
+Your current Git state is working correctly:
+
+String → origin/String
+and Git already told you that you're 1 commit ahead, so your push is independent of this display issue.
+
+Once you give me those four outputs, we'll know exactly what's happening under the hood.
+
+PS D:\DSA Projects\DSA-Java\String Programs> git for-each-ref --format="%(refname:short)" refs/heads/
+
+Arrays
+mukhya
+patterns
+string
+PS D:\DSA Projects\DSA-Java\String Programs> git symbolic-ref --short HEAD
+String
+PS D:\DSA Projects\DSA-Java\String Programs> git config --get core.ignorecase
+true
+PS D:\DSA Projects\DSA-Java\String Programs> git rev-parse --abbrev-ref HEAD
+String
+PS D:\DSA Projects\DSA-Java\String Programs>
+Perfect. Now we have the complete explanation. The outputs reveal the exact issue.
+
+Your Git repository is in a case-only branch-name situation
+These two outputs contradict each other:
+
+git for-each-ref ...
+string
+but:
+
+git symbolic-ref --short HEAD
+String
+That means:
+
+HEAD thinks:          String
+Actual local ref:     string
+And this confirms why:
+
+core.ignorecase
+true
+You're on Windows, whose filesystem normally treats:
+
+String
+string
+as the same filesystem name.
+
+What actually happened
+At some point, you had:
+
+String
+Then a lowercase:
+
+string
+came into the picture.
+
+Because Windows has:
+
+core.ignorecase = true
+Git's underlying branch reference storage can end up with this case mismatch:
+
+HEAD
+ ↓
+refs/heads/String
+       ↓
+Windows treats this like
+       ↓
+refs/heads/string
+So Git commands that ask "what branch is HEAD pointing to?" say:
+
+String
+while commands that enumerate the actual stored refs see:
+
+string
+And that's why VS Code is showing:
+
+string*
+while:
+
+git branch --show-current
+
+says:
+
+String
+So your branch is not actually two separate branches
+This is the important part.
+
+You do not have:
+
+String
+string
+as two independent branches.
+
+You effectively have one branch whose capitalization is inconsistent between Git's symbolic HEAD reference and the stored branch ref.
+
+Why git switch String behaved strangely
+When you did:
+
+git switch String
+
+Git successfully made:
+
+HEAD → String
+That's why:
+
+git symbolic-ref --short HEAD
+
+returns:
+
+String
+But because Windows considers String and string the same filesystem path, the underlying branch reference remains represented as:
+
+string
+Hence:
+
+git for-each-ref ...
+
+returns:
+
+string
+This also explains the VS Code display.
+
+✅ We can fix this cleanly
+We should normalize the branch name by temporarily renaming it to a completely different name and then renaming it back to String.
+
+This is safer than trying:
+
+git branch -m String
+
+because that's just a case-only rename, and Windows may treat it as "same name."
+
+Step 1 — Rename current branch to a temporary name
+You're currently on String, so run:
+
+git branch -m temp-string
+
+Now check:
+
+git branch
+
+You should see:
+
+  Arrays
+  mukhya
+  patterns
+* temp-string
+Step 2 — Rename it back to the desired capitalization
+git branch -m String
+
+Now:
+
+git branch
+
+should show:
+
+  Arrays
+  mukhya
+  patterns
+* String
+And then check:
+
+git for-each-ref --format="%(refname:short)" refs/heads/
+
+We want it to finally say:
+
+Arrays
+mukhya
+patterns
+String
+instead of:
+
+Arrays
+mukhya
+patterns
+string
+⚠️ But before doing that
+You previously had:
+
+Your branch is ahead of 'origin/String' by 1 commit.
+If you haven't pushed your Regex commit yet, I recommend:
+
+First:
+git push
+
+Then do the branch-name cleanup above.
+
+If you've already successfully pushed, don't push again just for this cleanup; do the rename and verify.
+
+One more important thing
+Your uncommitted changes:
+
+modified: nextVSnextLine.java
+and the untracked files in patterns
+
+are not related to this branch-name problem.
+
+Leave them alone for now.
+
+Your situation is basically:
+
+                         CURRENT PROBLEM
+
+                  ┌─────────────────────┐
+                  │       HEAD          │
+                  │       String        │
+                  └──────────┬──────────┘
+                             │
+                             ↓
+                  Windows case-insensitive
+                             │
+                             ↓
+                  actual ref appears as
+                        "string"
+                             │
+                             ↓
+                       VS Code shows
+                         "string"
+The temporary rename:
+
+String
+  ↓
+temp-string
+  ↓
+String
+forces Git/Windows to perform a real rename, rather than a capitalization-only rename.
+
+So, if your push is already done:
+Run exactly:
+
+git branch -m temp-string
+git branch -m String
+git branch
+git for-each-ref --format="%(refname:short)" refs/heads/
+
+Then paste the output. We'll verify that the repository is normalized before touching anything else.
+
+why first temporary name?
+Because Windows is case-insensitive, changing only:
+
+string
+to:
+
+String
+can be problematic.
+
+Think of it like this
+Windows can treat these two names as the same:
+
+string
+String
+STRING
+So if you tell Git:
+
+git branch -m String
+
+when the underlying branch is currently stored as string, Windows may effectively say:
+
+"You already have something called String — that's the same thing as string."
+
+Git may therefore not perform a clean filesystem-level rename.
+
+Why temp-string solves it
+We force the name to become completely different first:
+
+string
+   ↓
+temp-string
+   ↓
+String
+Now every step is unambiguous.
+
+Step 1
+git branch -m temp-string
+
+Windows clearly sees:
+
+string → temp-string
+Those are definitely different names.
+
+Step 2
+git branch -m String
+
+Now Windows sees:
+
+temp-string → String
+Again, definitely different.
+
+So we effectively force Git to perform:
+
+OLD:       string
+
+           ↓ REAL RENAME
+
+TEMP:      temp-string
+
+           ↓ REAL RENAME
+
+FINAL:     String
+Why not directly?
+git branch -m String
+
+is perfectly fine on a case-sensitive filesystem.
+
+The temporary-name trick is specifically useful when you need a case-only rename on a case-insensitive filesystem, such as the typical Windows setup you're using.
+
+In your case
+You currently have this weird mismatch:
+
+Git HEAD:       String
+Stored ref:     string
+VS Code:        string
+So we're not trying to create a new branch. We're trying to normalize the capitalization of the existing branch.
+
+That's why:
+
+git branch -m temp-string
+git branch -m String
+
+is safer than:
+
+git branch -m String
+
+And importantly, renaming a branch does not change your commits or files. It changes the branch's name/reference.
