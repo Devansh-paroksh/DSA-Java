@@ -8,7 +8,7 @@ class nextVSnextLine
 
         System.out.println("Enter the string to test next method");
         String s1 = sc.next();
-        System.out.println("String entered via nextLine is "+s1);
+        System.out.println("String entered via next is "+s1);
         System.out.println("Enter the string to test nextLine method");
         String s2 = sc.nextLine();
         System.out.println("String entered via nextLine is "+s2);
