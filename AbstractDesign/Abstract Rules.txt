@@ -1,0 +1,5 @@
+Important rules
+1. An abstract class can contain both abstract and normal methods.
+2. An abstract class can contain only normal methods too; it doesn't need even one abstract method.
+3. If a concrete subclass extends an abstract class, it must implement all inherited abstract methods unless it is itself declared abstract.
+4. You cannot create an object directly from an abstract class
