@@ -21,12 +21,29 @@ class Sparrow extends Bird
     }
 }
 
+class Crow extends Bird
+{
+    void fly()
+    {
+        System.out.println("Crow is flying");
+    }
+
+    void eat()
+    {
+        System.out.println("Crow is eating");
+    }
+}
+
 public class Main {
 
     public static void main(String[] args) {
         
         // Bird b=new Bird();--not allowed
         Bird b = new Sparrow();
+        b.fly();
+        b.eat();
+
+        b = new Crow();
         b.fly();
         b.eat();
     }
